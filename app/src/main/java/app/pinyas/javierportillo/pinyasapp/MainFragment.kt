@@ -1,0 +1,59 @@
+package app.pinyas.javierportillo.pinyasapp
+
+import android.support.v4.app.Fragment
+import android.os.Bundle
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.Menu
+import kotlinx.android.synthetic.main.fragment_main.*
+import org.json.JSONObject
+
+
+class MainFragment : Fragment() {
+
+    private var pinyrosEventList: ArrayList<PinyeroEvent>? = null
+    private var pinyerosEventAdapter: PinyeroEventAdapter? = null
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        setHasOptionsMenu(true)
+
+        val rootView = inflater.inflate(R.layout.fragment_main, container, false)
+
+        pinyrosEventList = ArrayList<PinyeroEvent>()
+        pinyerosEventAdapter = PinyeroEventAdapter(pinyrosEventList!!, this.context)  { pinyeroEvent ->
+
+        }
+
+        val driver_events = rootView.findViewById<RecyclerView>(R.id.pinyeros_list)
+        driver_events.adapter = pinyerosEventAdapter
+        driver_events.layoutManager = LinearLayoutManager(this.activity)
+
+        val service = ServiceVolley()
+        val apiController = APIController(service)
+
+        val path = "pinyas/pinyeros/"
+
+        apiController.get(path) { response ->
+            for (i in 0..(response!!.length() - 1)) {
+                val pinyeroTemp = PinyeroEvent()
+                pinyeroTemp.name = response!!.getJSONObject(i).getString("name")
+                pinyrosEventList!!.add(pinyeroTemp)
+
+            }
+
+        }
+
+        return rootView
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    }
+}
