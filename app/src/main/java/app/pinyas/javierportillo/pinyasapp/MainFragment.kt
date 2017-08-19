@@ -1,15 +1,27 @@
 package app.pinyas.javierportillo.pinyasapp
 
+import android.content.ClipData
+import android.content.ClipDescription
 import android.support.v4.app.Fragment
 import android.os.Bundle
+import android.support.v7.widget.CardView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Menu
+import android.widget.TextView
 import kotlinx.android.synthetic.main.fragment_main.*
+import kotlinx.android.synthetic.main.pinyeros_event_item.view.*
 import org.json.JSONObject
+import android.view.View.DragShadowBuilder
+import android.view.MotionEvent
+import android.annotation.SuppressLint
+import android.view.View.OnTouchListener
+
+
 
 
 class MainFragment : Fragment() {
@@ -38,14 +50,32 @@ class MainFragment : Fragment() {
         val path = "pinyas/pinyeros/"
 
         apiController.get(path) { response ->
-            for (i in 0..(response!!.length() - 1)) {
+            val dataArray = response!!.getJSONArray("data")
+            for (i in 0..(dataArray!!.length() - 1)) {
                 val pinyeroTemp = PinyeroEvent()
-                pinyeroTemp.name = response!!.getJSONObject(i).getString("name")
+                pinyeroTemp.name = dataArray.getJSONObject(i).getString("name")
                 pinyrosEventList!!.add(pinyeroTemp)
 
             }
 
         }
+
+        val canvas = rootView.findViewById<MyView>(R.id.myView3)
+        val filepath = "files/tres.json"
+
+        apiController.get(filepath) { response ->
+            Log.e("DragDrop Action", response.toString())
+            canvas.fillCastell(response!!.getJSONArray("file"))
+
+        }
+
+        val mDragListen = canvasOnDrag()
+
+
+
+
+
+       // canvas.setOnDragListener(mDragListen)
 
         return rootView
     }

@@ -11,7 +11,7 @@ import org.json.JSONObject
 
 class ServiceVolley : ServiceInterface {
     val TAG = ServiceVolley::class.java.simpleName
-    val basePath = "http://192.168.0.66:3000/"
+    val basePath = "http://192.168.1.37:3000/"
 
     override fun post(path: String, params: JSONObject, completionHandler: (response: JSONObject?) -> Unit) {
         val jsonObjReq = object : JsonObjectRequest(Method.POST, basePath + path, params,
@@ -34,9 +34,9 @@ class ServiceVolley : ServiceInterface {
         BackendVolley.instance?.addToRequestQueue(jsonObjReq, TAG)
     }
 
-    override fun get(path: String, completionHandler: (response: JSONArray?) -> Unit) {
-        val jsonObjReq = object : JsonArrayRequest(Method.GET, basePath + path, null,
-                Response.Listener<JSONArray> { response ->
+    override fun get(path: String, completionHandler: (response: JSONObject?) -> Unit) {
+        val jsonObjReq = object : JsonObjectRequest(Method.GET, basePath + path, null,
+                Response.Listener<JSONObject> { response ->
                     Log.d(TAG, "/get request OK! Response: $response")
                     completionHandler(response)
                 },
