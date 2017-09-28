@@ -58,7 +58,7 @@ internal class PinyeroEventAdapter (private val arrayList: ArrayList<PinyeroEven
                     // Create a new ClipData using the tag as a label, the plain text MIME type, and
                     // the already-created item. This will create a new ClipDescription object within the
                     // ClipData, and set its MIME type entry to "text/plain"
-                    val dragData = ClipData.newPlainText ("uno","dos")
+                    val dragData = ClipData.newPlainText (this.name,this.name)
 
                     // Instantiates the drag shadow builder.
                     val myShadow = View.DragShadowBuilder(itemView.pinyero_name);

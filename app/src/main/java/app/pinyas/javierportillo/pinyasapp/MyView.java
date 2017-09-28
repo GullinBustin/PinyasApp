@@ -1,6 +1,7 @@
 package app.pinyas.javierportillo.pinyasapp;
 
 import android.content.ClipData;
+import android.content.ClipDescription;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -29,7 +30,9 @@ public class MyView extends View {
     private int mActivePointerId = -1;
     private float mPosX, mPosY;
     private JSONArray castell;
-
+    private double[] draggedPoint = {-1,-1};
+    private boolean isDragged = false;
+    private String dragName = "";
 
     public MyView(Context context) {
         super(context);
@@ -59,13 +62,17 @@ public class MyView extends View {
                 h = rect.getJSONArray(1).getDouble(1);
                 a = rect.getDouble(2);
 
-                JSONArray nomPos = posicio.getJSONArray("pos");
-                for(int nameNum = 0; nameNum < nomPos.length(); nameNum++) {
-                    if(nameNum != 0){
-                        name += "_";
-                    }
-                    name += nomPos.getString(nameNum);
+                if(isDragged && checkRectIsTouched(draggedPoint, new double[] {x,y}, new double[]{w,h}, a)) {
+                    name = dragName;
+                }else{
+                    JSONArray nomPos = posicio.getJSONArray("pos");
+                    for (int nameNum = 0; nameNum < nomPos.length(); nameNum++) {
+                        if (nameNum != 0) {
+                            name += "_";
+                        }
+                        name += nomPos.getString(nameNum);
 
+                    }
                 }
 
             } catch (JSONException e) {
@@ -105,7 +112,9 @@ public class MyView extends View {
 */
 
         paint.setColor(Color.RED);
-        canvas.drawCircle(mLastTouchX, mLastTouchY, 10, paint);
+        //canvas.drawCircle(mLastTouchX, mLastTouchY, 10, paint);
+        canvas.drawCircle((float)draggedPoint[0], (float)draggedPoint[1], 10, paint);
+
     }
 
 
@@ -191,14 +200,36 @@ public class MyView extends View {
     @Override
     public boolean onDragEvent(DragEvent event) {
         int action = event.getAction();
+        isDragged = false;
         if(action == DragEvent.ACTION_DROP ) {
             ClipData a = event.getClipData();
             if (a != null) {
                 ClipData.Item b = a.getItemAt(0);
                 CharSequence c = b.getText();
                 String d = c.toString();
-                Log.e("DragDrop Action", d);
+                Log.e("DragDrop Drp Item", d);
             }
+        }
+        if(action == DragEvent.ACTION_DRAG_LOCATION ) {
+            draggedPoint = new double[]{event.getX(),event.getY()};
+            isDragged = true;
+            ClipDescription desc = event.getClipDescription();
+            ClipData a = event.getClipData();
+            if (desc != null){
+                String descText = desc.getLabel().toString();
+                //Log.e("DragDrop Location Desc", descText);
+                //Log.e("DragDrop Location Desc", draggedPoint[0]+"   "+draggedPoint[1]);
+
+                dragName = descText;
+
+            }
+            if (a != null) {
+                ClipData.Item b = a.getItemAt(0);
+                CharSequence c = b.getText();
+                String d = c.toString();
+                Log.e("DragDrop Location item", d);
+            }
+            this.invalidate();
         }
         return true;
     }
